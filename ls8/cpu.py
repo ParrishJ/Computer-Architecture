@@ -5,9 +5,12 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
+ADD = 0b10100000
 MULT = 0b10100010
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET = 0b00010001
 
 class CPU:
     """Main CPU class."""
@@ -102,9 +105,9 @@ class CPU:
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
-        if op == "ADD":
+        if op == ADD:
             self.reg[reg_a] += self.reg[reg_b]
-        if op == MULT:
+        elif op == MULT:
             print('regs', reg_a, reg_b)
             self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
             
@@ -179,7 +182,13 @@ class CPU:
             self.reg[operand_a] = operand_b
             self.pc += 3
             print(f'ldi ran --{operand_b} store in reg{operand_a}')
-
+        elif instruction == ADD:
+            """ self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
+            
+            print('mult ran') """
+            self.alu(instruction, operand_a, operand_b)
+            self.pc += 3
+            print('add ran')
         elif instruction == MULT:
             """ self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
             
@@ -202,7 +211,18 @@ class CPU:
             print(f'pop ran --{self.ram[self.reg[self.stack_pointer]]}in reg{reg_to_pop}')
             self.reg[self.stack_pointer] += 1
             self.pc += 2
-           
+        elif instruction == CALL:
+            self.reg[self.stack_pointer] -= 1
+            # maybe NOT operand_b
+            address_of_next_instruction = self.pc + 2
+            self.ram[self.reg[self.stack_pointer]] = address_of_next_instruction
+            reg_to_get_address_from = self.ram[operand_a]
+            self.pc = self.reg[reg_to_get_address_from]
+            print('call ran')
+        elif instruction == RET:
+            self.pc = self.ram[self.reg[self.stack_pointer]]
+            self.reg[self.stack_pointer] += 1
+            print('ret ran')
         ##### MULT FROM CLASS
         """ elif instruction == MULT:
             self.reg[operand_a] *= self.reg[operand_b]
