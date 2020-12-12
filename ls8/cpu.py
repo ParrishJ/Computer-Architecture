@@ -278,17 +278,25 @@ class CPU:
             self.pc += 3
             print('cmp ran')
         elif instruction == JMP:
-            address_to_jump_to = operand_a
+            address_to_jump_to = self.reg[operand_a]
             self.pc = address_to_jump_to
             print('jmp ran')
         elif instruction == JEQ:
             if self.reg[self.fl] == 0b00000001:
-                address_to_jump_to = operand_a
+                address_to_jump_to = self.reg[operand_a]
                 self.pc = address_to_jump_to
+                print(f'jeq ran - to address{address_to_jump_to}')
             else:
                 self.pc += 2
+                print('jeq skipped')
         elif instruction == JNE:
-            pass
+            if self.reg[self.fl] != 0b00000001:
+                address_to_jump_to = self.reg[operand_a]
+                self.pc = address_to_jump_to
+                print(f'JNE ran - to address{address_to_jump_to}')
+            else:
+                print('jne skipped')
+                self.pc += 2
         ##### MULT FROM CLASS
         """ elif instruction == MULT:
             self.reg[operand_a] *= self.reg[operand_b]
