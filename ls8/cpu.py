@@ -118,45 +118,71 @@ class CPU:
             print('regs', reg_a, reg_b)
             self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
         elif op == CMP:
+            print('in cmp')
             flag_val = self.reg[self.fl]
             if self.reg[reg_a] == self.reg[reg_b]:
+                print('equal')
+                if flag_val == 0b00000000:
+                    equal_val = (flag_val | 0b00000001)
+                    print(equal_val, 'equal val')
+                    self.reg[self.fl] = equal_val
                 if flag_val == 0b00000001:
                     flag_val = (flag_val & 0b11111110)
                     equal_val = (flag_val | 0b00000001)
+                    print(equal_val, 'equal val')
                     self.reg[self.fl] = equal_val
                 if flag_val == 0b0000010:
                     flag_val = (flag_val & 0b11111101)
                     equal_val = (flag_val | 0b00000001)
+                    print(equal_val, 'equal val')
                     self.reg[self.fl] = equal_val
                 if flag_val == 0b00000100:
                     flag_val = (flag_val & 0b11111011)
                     equal_val = (flag_val | 0b00000001)
+                    print(equal_val, 'equal val')
                     self.reg[self.fl] = equal_val
             if self.reg[reg_a] < self.reg[reg_b]:
+                if flag_val == 0b00000000:
+                    less_val = (flag_val | 0b00000100)
+                    
+                    self.reg[self.fl] = less_val
+                print('less')
                 if flag_val == 0b00000001:
+                    
                     flag_val = (flag_val & 0b11111110)
                     less_val = (flag_val | 0b00000100)
+                    print(less_val, 'equal val')
                     self.reg[self.fl] = less_val
                 if flag_val == 0b0000010:
                     flag_val = (flag_val & 0b11111101)
                     less_val = (flag_val | 0b00000100)
+                    print(less_val, 'equal val')
                     self.reg[self.fl] = less_val
                 if flag_val == 0b00000100:
                     flag_val = (flag_val & 0b11111011)
                     less_val = (flag_val | 0b00000100)
+                    print(less_val, 'equal val')
                     self.reg[self.fl] = less_val
             if self.reg[reg_a] > self.reg[reg_b]:
+                print('greater')
+                if flag_val == 0b00000000:
+                    greater_val = (flag_val | 0b00000010)
+                    
+                    self.reg[self.fl] = greater_val
                 if flag_val == 0b00000001:
                     flag_val = (flag_val & 0b11111110)
                     greater_val = (flag_val | 0b0000010)
+                    print(greater_val, 'equal val')
                     self.reg[self.fl] = greater_val
                 if flag_val == 0b0000010:
                     flag_val = (flag_val & 0b11111101)
                     greater_val = (flag_val | 0b00000010)
+                    print(greater_val, 'equal val')
                     self.reg[self.fl] = greater_val
                 if flag_val == 0b00000100:
                     flag_val = (flag_val & 0b11111011)
                     greater_val = (flag_val | 0b00000010)
+                    print(greater_val, 'equal val')
                     self.reg[self.fl] = greater_val
             #self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
             
@@ -282,7 +308,9 @@ class CPU:
             self.pc = address_to_jump_to
             print('jmp ran')
         elif instruction == JEQ:
-            if self.reg[self.fl] == 0b00000001:
+            fl_val = self.reg[self.fl]
+            masked_fl_val = (fl_val & 0b00000001)
+            if masked_fl_val == 0b00000001:
                 address_to_jump_to = self.reg[operand_a]
                 self.pc = address_to_jump_to
                 print(f'jeq ran - to address{address_to_jump_to}')
@@ -290,7 +318,9 @@ class CPU:
                 self.pc += 2
                 print('jeq skipped')
         elif instruction == JNE:
-            if self.reg[self.fl] != 0b00000001:
+            fl_val = self.reg[self.fl]
+            masked_fl_val = (fl_val & 0b00000001)
+            if masked_fl_val == 0:
                 address_to_jump_to = self.reg[operand_a]
                 self.pc = address_to_jump_to
                 print(f'JNE ran - to address{address_to_jump_to}')

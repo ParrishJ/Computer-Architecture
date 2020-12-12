@@ -15,7 +15,7 @@ else:
     cpu.run() """
 ##############
 
-console_args = sys.argv[1]
+console_args = 'sc.ls8' #sys.argv[1]
 cpu = CPU()
 cpu.load(console_args)
 cpu.run()
