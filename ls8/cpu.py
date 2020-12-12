@@ -24,15 +24,13 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.pc = 0 
-        self.fl = 0
         self.running = True
         self.halted = False
         #self.reg = [0, 0, 0, 0, 0, 0, 0, 0xF4]
         self.reg = [0] * 8
         self.reg[7] = 0xF4
         self.stack_pointer = 7
-        self.fl = 6
-        self.reg[self.fl] = 0b00000000
+        self.fl = 0b00000000
         self.memory = []
         """ self.HLT = 0b00000001
         self.LDI = 0b10000010
@@ -63,12 +61,12 @@ class CPU:
         except FileNotFoundError:
             print("File Not Found")
             
-        print("program code!!!!!!!!!!!", program_code)
+        #print("program code!!!!!!!!!!!", program_code)
         stack_space = 256 - len(program_code)
         memory = program_code + [0] * stack_space
         
         self.reg[self.stack_pointer] = len(memory) - 1
-        print('memory', memory)
+        #print('memory', memory)
         #########################################################################################
         ############################################################################### From Class
         """ address = 0
@@ -106,7 +104,7 @@ class CPU:
         for instruction in memory:
             self.ram[address] = instruction
             address += 1
-        print(self.ram, 'ram')
+        #print(self.ram, 'ram')
 
 
     def alu(self, op, reg_a, reg_b):
@@ -118,72 +116,55 @@ class CPU:
             print('regs', reg_a, reg_b)
             self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
         elif op == CMP:
-            print('in cmp')
-            flag_val = self.reg[self.fl]
+            flag_val = self.fl
             if self.reg[reg_a] == self.reg[reg_b]:
-                print('equal')
                 if flag_val == 0b00000000:
                     equal_val = (flag_val | 0b00000001)
-                    print(equal_val, 'equal val')
-                    self.reg[self.fl] = equal_val
+                    self.fl = equal_val
                 if flag_val == 0b00000001:
                     flag_val = (flag_val & 0b11111110)
                     equal_val = (flag_val | 0b00000001)
-                    print(equal_val, 'equal val')
-                    self.reg[self.fl] = equal_val
+                    self.fl = equal_val
                 if flag_val == 0b0000010:
                     flag_val = (flag_val & 0b11111101)
                     equal_val = (flag_val | 0b00000001)
-                    print(equal_val, 'equal val')
-                    self.reg[self.fl] = equal_val
+                    self.fl = equal_val
                 if flag_val == 0b00000100:
                     flag_val = (flag_val & 0b11111011)
                     equal_val = (flag_val | 0b00000001)
-                    print(equal_val, 'equal val')
-                    self.reg[self.fl] = equal_val
+                    self.fl = equal_val
             if self.reg[reg_a] < self.reg[reg_b]:
                 if flag_val == 0b00000000:
                     less_val = (flag_val | 0b00000100)
-                    
-                    self.reg[self.fl] = less_val
-                print('less')
+                    self.fl = less_val
                 if flag_val == 0b00000001:
-                    
                     flag_val = (flag_val & 0b11111110)
                     less_val = (flag_val | 0b00000100)
-                    print(less_val, 'equal val')
-                    self.reg[self.fl] = less_val
+                    self.fl = less_val
                 if flag_val == 0b0000010:
                     flag_val = (flag_val & 0b11111101)
                     less_val = (flag_val | 0b00000100)
-                    print(less_val, 'equal val')
-                    self.reg[self.fl] = less_val
+                    self.fl = less_val
                 if flag_val == 0b00000100:
                     flag_val = (flag_val & 0b11111011)
                     less_val = (flag_val | 0b00000100)
-                    print(less_val, 'equal val')
-                    self.reg[self.fl] = less_val
+                    self.fl = less_val
             if self.reg[reg_a] > self.reg[reg_b]:
-                print('greater')
                 if flag_val == 0b00000000:
                     greater_val = (flag_val | 0b00000010)
-                    
-                    self.reg[self.fl] = greater_val
+                    self.fl = greater_val
                 if flag_val == 0b00000001:
                     flag_val = (flag_val & 0b11111110)
                     greater_val = (flag_val | 0b0000010)
-                    print(greater_val, 'equal val')
-                    self.reg[self.fl] = greater_val
+                    self.fl = greater_val
                 if flag_val == 0b0000010:
                     flag_val = (flag_val & 0b11111101)
                     greater_val = (flag_val | 0b00000010)
-                    print(greater_val, 'equal val')
-                    self.reg[self.fl] = greater_val
+                    self.fl = greater_val
                 if flag_val == 0b00000100:
                     flag_val = (flag_val & 0b11111011)
                     greater_val = (flag_val | 0b00000010)
-                    print(greater_val, 'equal val')
-                    self.reg[self.fl] = greater_val
+                    self.fl = greater_val
             #self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
             
         #elif op == "SUB": etc
@@ -245,45 +226,35 @@ class CPU:
         # From class
     def execute_instruction(self, instruction, operand_a, operand_b):
         if instruction == HLT:
-            print('hlt ran')
+            #print('hlt ran')
             self.halted = True
-
         elif instruction == PRN:
             print(self.reg[operand_a])
             self.pc += 2
-            print('prn ran')
-
+            #print('prn ran')
         elif instruction == LDI:
             self.reg[operand_a] = operand_b
             self.pc += 3
-            print(f'ldi ran --{operand_b} store in reg{operand_a}')
+            #print(f'ldi ran --{operand_b} store in reg{operand_a}')
         elif instruction == ADD:
-            """ self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
-            
-            print('mult ran') """
             self.alu(instruction, operand_a, operand_b)
             self.pc += 3
-            print('add ran')
+            #print('add ran')
         elif instruction == MULT:
-            """ self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
-            
-            print('mult ran') """
             self.alu(instruction, operand_a, operand_b)
             self.pc += 3
-            print('mult ran')
+            #print('mult ran')
         elif instruction == PUSH:
             self.reg[self.stack_pointer] -= 1
             reg_to_retrieve_val = operand_a
             val_in_reg = self.reg[reg_to_retrieve_val]
             self.ram[self.reg[self.stack_pointer]] = val_in_reg
             self.pc += 2
-            
-            print('push --- val in ram', self.ram[self.reg[self.stack_pointer]] )
+            #print('push --- val in ram', self.ram[self.reg[self.stack_pointer]] )
         elif instruction == POP:
             reg_to_pop = operand_a
-            
             self.reg[reg_to_pop] = self.ram[self.reg[self.stack_pointer]]
-            print(f'pop ran --{self.ram[self.reg[self.stack_pointer]]}in reg{reg_to_pop}')
+            #print(f'pop ran --{self.ram[self.reg[self.stack_pointer]]}in reg{reg_to_pop}')
             self.reg[self.stack_pointer] += 1
             self.pc += 2
         elif instruction == CALL:
@@ -293,39 +264,39 @@ class CPU:
             self.ram[self.reg[self.stack_pointer]] = address_of_next_instruction
             reg_to_get_address_from = self.ram[operand_a]
             self.pc = self.reg[reg_to_get_address_from]
-            print('call ran')
+            #print('call ran')
         elif instruction == RET:
             self.pc = self.ram[self.reg[self.stack_pointer]]
             self.reg[self.stack_pointer] += 1
-            print('ret ran')
+            #print('ret ran')
         ## Sprint Challenge 
         elif instruction == CMP:
             self.alu(instruction, operand_a, operand_b)
             self.pc += 3
-            print('cmp ran')
+            #print('cmp ran')
         elif instruction == JMP:
             address_to_jump_to = self.reg[operand_a]
             self.pc = address_to_jump_to
-            print('jmp ran')
+            #print('jmp ran')
         elif instruction == JEQ:
-            fl_val = self.reg[self.fl]
+            fl_val = self.fl
             masked_fl_val = (fl_val & 0b00000001)
             if masked_fl_val == 0b00000001:
                 address_to_jump_to = self.reg[operand_a]
                 self.pc = address_to_jump_to
-                print(f'jeq ran - to address{address_to_jump_to}')
+                #print(f'jeq ran - to address{address_to_jump_to}')
             else:
                 self.pc += 2
-                print('jeq skipped')
+                #print('jeq skipped')
         elif instruction == JNE:
-            fl_val = self.reg[self.fl]
+            fl_val = self.fl
             masked_fl_val = (fl_val & 0b00000001)
             if masked_fl_val == 0:
                 address_to_jump_to = self.reg[operand_a]
                 self.pc = address_to_jump_to
-                print(f'JNE ran - to address{address_to_jump_to}')
+                #print(f'JNE ran - to address{address_to_jump_to}')
             else:
-                print('jne skipped')
+                #print('jne skipped')
                 self.pc += 2
         ##### MULT FROM CLASS
         """ elif instruction == MULT:
