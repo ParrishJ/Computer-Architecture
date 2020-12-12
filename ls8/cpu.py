@@ -7,10 +7,12 @@ LDI = 0b10000010
 PRN = 0b01000111
 ADD = 0b10100000
 MULT = 0b10100010
+CMP = 0b10100111 
 PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
+
 
 class CPU:
     """Main CPU class."""
@@ -26,6 +28,8 @@ class CPU:
         self.reg = [0] * 8
         self.reg[7] = 0xF4
         self.stack_pointer = 7
+        self.fl = 6
+        self.reg[self.fl] = 0b00000000
         self.memory = []
         """ self.HLT = 0b00000001
         self.LDI = 0b10000010
@@ -110,6 +114,48 @@ class CPU:
         elif op == MULT:
             print('regs', reg_a, reg_b)
             self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
+        elif op == CMP:
+            flag_val = self.reg[self.fl]
+            if self.reg[reg_a] == self.reg[reg_b]:
+                if flag_val == 0b00000001:
+                    flag_val = (flag_val & 0b11111110)
+                    equal_val = (flag_val | 0b00000001)
+                    self.reg[self.fl] = equal_val
+                if flag_val == 0b0000010:
+                    flag_val = (flag_val & 0b11111101)
+                    equal_val = (flag_val | 0b00000001)
+                    self.reg[self.fl] = equal_val
+                if flag_val == 0b00000100:
+                    flag_val = (flag_val & 0b11111011)
+                    equal_val = (flag_val | 0b00000001)
+                    self.reg[self.fl] = equal_val
+            if self.reg[reg_a] < self.reg[reg_b]:
+                if flag_val == 0b00000001:
+                    flag_val = (flag_val & 0b11111110)
+                    less_val = (flag_val | 0b00000100)
+                    self.reg[self.fl] = less_val
+                if flag_val == 0b0000010:
+                    flag_val = (flag_val & 0b11111101)
+                    less_val = (flag_val | 0b00000100)
+                    self.reg[self.fl] = less_val
+                if flag_val == 0b00000100:
+                    flag_val = (flag_val & 0b11111011)
+                    less_val = (flag_val | 0b00000100)
+                    self.reg[self.fl] = less_val
+            if self.reg[reg_a] > self.reg[reg_b]:
+                if flag_val == 0b00000001:
+                    flag_val = (flag_val & 0b11111110)
+                    greater_val = (flag_val | 0b0000010)
+                    self.reg[self.fl] = greater_val
+                if flag_val == 0b0000010:
+                    flag_val = (flag_val & 0b11111101)
+                    greater_val = (flag_val | 0b00000010)
+                    self.reg[self.fl] = greater_val
+                if flag_val == 0b00000100:
+                    flag_val = (flag_val & 0b11111011)
+                    greater_val = (flag_val | 0b00000010)
+                    self.reg[self.fl] = greater_val
+            #self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
             
         #elif op == "SUB": etc
         else:
@@ -223,6 +269,11 @@ class CPU:
             self.pc = self.ram[self.reg[self.stack_pointer]]
             self.reg[self.stack_pointer] += 1
             print('ret ran')
+        ## Sprint Challenge 
+        elif instruction == CMP:
+            self.alu(instruction, operand_a, operand_b)
+            self.pc += 3
+            print('cmp ran')
         ##### MULT FROM CLASS
         """ elif instruction == MULT:
             self.reg[operand_a] *= self.reg[operand_b]
