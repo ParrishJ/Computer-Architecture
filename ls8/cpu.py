@@ -12,6 +12,7 @@ PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
+JMP = 0b01010100 
 
 
 class CPU:
@@ -274,6 +275,10 @@ class CPU:
             self.alu(instruction, operand_a, operand_b)
             self.pc += 3
             print('cmp ran')
+        elif instruction == JMP:
+            address_to_jump_to = operand_b
+            self.pc = address_to_jump_to
+            print('jmp ran')
         ##### MULT FROM CLASS
         """ elif instruction == MULT:
             self.reg[operand_a] *= self.reg[operand_b]
